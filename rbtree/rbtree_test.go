@@ -10,15 +10,18 @@ import (
 	"time"
 )
 
+const TESTLEN int = 10000
+
 func TestRBTree(test *testing.T) {
 	rbtree := NewRBTree()
 
 	rand.Seed(time.Now().UnixNano())
-	intarr := rand.Perm(10000)
+	intarr := rand.Perm(TESTLEN)
+	value := int64(intarr[0])
 	// fmt.Println(intarr)
 	var buffer bytes.Buffer
 	for index, data := range intarr {
-		rbtree.insert(int64(data))
+		rbtree.Insert(int64(data))
 		buffer.WriteString(fmt.Sprintf(" %d", index))
 	}
 	sort.Ints(intarr)
@@ -30,4 +33,13 @@ func TestRBTree(test *testing.T) {
 	}
 	// fmt.Println("print tree")
 	// printTree(rbtree.root, "", true)
+
+	if !rbtree.Search(value) {
+		test.Errorf("%d must be in rb tree\n", value)
+	}
+
+	if rbtree.Search(int64(TESTLEN)) {
+		test.Errorf("%d must be not in rb tree\n", TESTLEN)
+	}
+
 }

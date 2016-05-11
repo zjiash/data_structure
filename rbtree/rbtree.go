@@ -13,8 +13,27 @@ func NewRBTree() *RBTree {
 	return &RBTree{root: nil}
 }
 
+// 查询
+func (self *RBTree) Search(data int64) bool {
+	return self.searchNode(self.root, data)
+}
+
+func (self *RBTree) searchNode(node *RBNode, data int64) bool {
+	if node == nil {
+		return false
+	}
+	if node.value == data {
+		return true
+	} else if node.value > data {
+		return self.searchNode(node.left, data)
+	} else {
+		return self.searchNode(node.right, data)
+	}
+	return false
+}
+
 // 插入
-func (self *RBTree) insert(data int64) {
+func (self *RBTree) Insert(data int64) {
 	if self.root == nil {
 		tmp := NewRBNode(data)
 		tmp.color = BLACK
