@@ -6,17 +6,29 @@ import (
 )
 
 type HeapItem interface {
-	Priority() int
+	Priority() int64
 }
 
 type Heap struct {
 	data []HeapItem
 }
 
-func NewHeap(items []HeapItem) *Heap {
-	h := Heap{data: items}
+func NewEmptyHeap() *Heap {
+	return &Heap{data: []HeapItem{}}
+}
+
+func NewHeap(items []interface{}) (*Heap, error) {
+	data := make([]HeapItem, len(items))
+	for index, item := range items {
+		if value, ok := item.(HeapItem); ok {
+			data[index] = value
+		} else {
+			return nil, errors.New("item not match with interface HeapItem")
+		}
+	}
+	h := &Heap{data: data}
 	h.init()
-	return &h
+	return h, nil
 }
 
 func leftChild(i int) int {
@@ -31,12 +43,6 @@ func getParent(i int) int {
 	return (i - 1) / 2
 }
 
-func swap(items []HeapItem, i int, j int) {
-	tmp := items[i]
-	items[i] = items[j]
-	items[j] = tmp
-}
-
 func (self *Heap) init() {
 	size := len(self.data)
 	for i := getParent(size - 1); i >= 0; i-- {
@@ -44,13 +50,18 @@ func (self *Heap) init() {
 	}
 }
 
-func (self *Heap) Push(item HeapItem) {
-	self.data = append(self.data, item)
-	size := len(self.data)
-	self.shiftUp(size - 1)
+func (self *Heap) Push(item interface{}) error {
+	if value, ok := item.(HeapItem); ok {
+		self.data = append(self.data, value)
+		size := len(self.data)
+		self.shiftUp(size - 1)
+		return nil
+	} else {
+		return errors.New("item not match with interface HeapItem")
+	}
 }
 
-func (self *Heap) Pop() (HeapItem, error) {
+func (self *Heap) Pop() (interface{}, error) {
 	if len(self.data) <= 0 {
 		return nil, errors.New("pop empty heap")
 	}
@@ -62,6 +73,17 @@ func (self *Heap) Pop() (HeapItem, error) {
 		self.shiftDown(0)
 	}
 	return res, nil
+}
+
+func (self *Heap) Top() (interface{}, error) {
+	if len(self.data) <= 0 {
+		return nil, errors.New("pop empty heap")
+	}
+	return self.data[0], nil
+}
+
+func (self *Heap) IsEmpty() bool {
+	return len(self.data) <= 0
 }
 
 func (self *Heap) shiftUp(i int) {
