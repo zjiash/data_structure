@@ -97,3 +97,8 @@ func (self *HeapAlarm) Add(when time.Time, call AlarmFunc, name string) error {
 	self.mutex.Unlock()
 	return nil
 }
+
+func (self *HeapAlarm) Cancel(name string) error {
+	// todo
+	return nil
+}

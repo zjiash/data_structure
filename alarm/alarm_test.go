@@ -24,10 +24,9 @@ func warpTask(t task) func() {
 	}
 }
 
-func TestHeapAlarm(test *testing.T) {
+func prepareTask(alarmBase interface{}) {
+	alarm := alarmBase.(Alarm)
 	now := time.Now()
-	alarm := NewHeapAlarm()
-
 	task0 := task{
 		Name: "task0",
 		When: now.Add(time.Second * 2),
@@ -48,4 +47,15 @@ func TestHeapAlarm(test *testing.T) {
 	alarm.Add(task1.When, warpTask(task1), task1.Name)
 
 	time.Sleep(12 * time.Second)
+}
+
+func TestHeapAlarm(test *testing.T) {
+	alarm := NewHeapAlarm()
+	prepareTask(alarm)
+}
+
+func TestTimerWheelAlarm(test *testing.T) {
+	alarm := NewTimerWheelAlarm()
+	alarm.curSec = 55
+	prepareTask(alarm)
 }
